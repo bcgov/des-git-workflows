@@ -1,6 +1,7 @@
 name: Linting
 
 on:
+  workflow_call:
   pull_request:
     branches:
       - development
