@@ -1,0 +1,81 @@
+name: Linting
+
+on:
+  pull_request:
+    branches:
+      - development
+  workflow_dispatch:
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          if [ -f composer.json ]; then
+            composer install
+          fi
+          if [ -f package.json ]; then
+            npm install
+            npm install @wordpress/scripts --save-dev
+          fi
+
+      - name: Validate Composer configuration
+        run: |
+          if [ -f composer.json ]; then
+            OUTPUT=$(composer validate --no-check-publish)
+            if grep -q 'ERROR' <<< "$OUTPUT"; then
+              exit 1
+            fi
+          else
+            echo "No composer.json found, skipping Composer validation."
+          fi
+
+      - name: Lint PHP
+        run: |
+          if [ -f composer.json ]; then
+            OUTPUT=$(composer phpcs-allow-todo --no-check-publish 2>&1)
+            echo "$OUTPUT" | tee phpcs_output.log
+            if grep -q 'ERROR' <<< "$OUTPUT"; then
+              echo "PHPCS found errors. Check phpcs_output.log for details."
+              exit 1
+            fi
+          else
+            echo "No composer.json found, skipping PHP linting."
+          fi
+
+      - name: Lint CSS
+        run: |
+          if [ -f package.json ]; then
+            npm run lint:css
+          else
+            echo "No package.json found, skipping CSS linting."
+          fi
+
+      - name: Lint JS
+        run: |
+          if [ -f package.json ]; then
+            npm run lint:js
+          else
+            echo "No package.json found, skipping JS linting."
+          fi
+
+      - name: Scan WordPress Patterns
+        run: |
+          if [ -d patterns ]; then
+            if [ -f composer.json ]; then
+              composer scan-wp-patterns
+            else
+              echo "No composer.json found, skipping WordPress patterns scan."
+            fi
+          else
+            echo "No 'patterns' directory found, skipping WordPress patterns scan."
+          fi
