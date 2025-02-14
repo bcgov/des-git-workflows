@@ -34,6 +34,7 @@ jobs:
           if [ -f composer.json ]; then
             OUTPUT=$(composer validate --no-check-publish)
             if grep -q 'ERROR' <<< "$OUTPUT"; then
+              echo "Composer validation failed. Check the output for details."
               exit 1
             fi
           else
@@ -45,9 +46,15 @@ jobs:
           if [ -f composer.json ]; then
             OUTPUT=$(composer phpcs-allow-todo --no-check-publish 2>&1)
             echo "$OUTPUT" | tee phpcs_output.log
-            if grep -q 'ERROR' <<< "$OUTPUT"; then
+            if echo "$OUTPUT" | grep -q 'ERROR'; then
               echo "PHPCS found errors. Check phpcs_output.log for details."
               exit 1
+            elif echo "$OUTPUT" | grep -q 'WARNING'; then
+              echo "PHPCS found warnings. Check phpcs_output.log for details."
+              # Optionally exit with a warning status
+              exit 0
+            else
+              echo "PHPCS completed successfully, no errors or warnings."
             fi
           else
             echo "No composer.json found, skipping PHP linting."
