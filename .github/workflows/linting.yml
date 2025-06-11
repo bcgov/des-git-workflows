@@ -14,7 +14,7 @@ jobs:
       - name: Install Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: |
@@ -25,6 +25,15 @@ jobs:
             npm install
             npm install @wordpress/scripts --save-dev
           fi
+          # Install dependencies in subdirectories
+          for dir in $(find . -type f -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;); do
+            if [ "$dir" != "." ]; then
+              echo "Installing dependencies in $dir"
+              cd $dir
+              npm install
+              cd -
+            fi
+          done
 
       - name: Validate Composer configuration
         run: |
