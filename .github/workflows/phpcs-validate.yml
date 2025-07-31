@@ -36,7 +36,7 @@ jobs:
       - name: Run PHP CodeSniffer
         run: |
           echo "🧹 Running PHP CodeSniffer..."
-          OUTPUT=$(composer phpcs-allow-todo --no-check-publish 2>&1)
+          OUTPUT=$(composer phpcs-allow-todo 2>&1)
           echo "$OUTPUT" | tee phpcs_output.log
 
           if echo "$OUTPUT" | grep -q 'ERROR'; then
