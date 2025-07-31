@@ -36,18 +36,19 @@ jobs:
       - name: Run PHP CodeSniffer
         run: |
           echo "🧹 Running PHP CodeSniffer..."
-          OUTPUT=$(composer phpcs-allow-todo 2>&1)
-          echo "$OUTPUT" | tee phpcs_output.log
+          echo "Running composer phpcs-allow-todo..."
+          composer phpcs-allow-todo 2>&1 | tee phpcs_output.log
 
-          if echo "$OUTPUT" | grep -q 'ERROR'; then
-            echo "❌ PHPCS found errors. Check phpcs_output.log for details."
-            exit 1
-          elif echo "$OUTPUT" | grep -q 'WARNING'; then
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "✅ PHPCS completed successfully - no errors or warnings found!"
+          elif [ $EXIT_CODE -eq 1 ]; then
             echo "⚠️  PHPCS found warnings. Check phpcs_output.log for details."
             echo "    Warnings don't fail the build, but should be addressed."
             exit 0
           else
-            echo "✅ PHPCS completed successfully - no errors or warnings found!"
+            echo "❌ PHPCS found errors. Check phpcs_output.log for details."
+            exit $EXIT_CODE
           fi
 
     env:
