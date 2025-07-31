@@ -60,16 +60,11 @@ jobs:
 
           # Run pattern validation and capture output
           echo "Running: composer scan-wp-patterns"
-          OUTPUT=$(composer scan-wp-patterns 2>&1)
-          echo "$OUTPUT" | tee pattern_validation.log
+          composer scan-wp-patterns 2>&1 | tee pattern_validation.log
 
-          if echo "$OUTPUT" | grep -q 'ERROR'; then
+          if [ $? -ne 0 ]; then
             echo "❌ WordPress pattern validation found errors. Check pattern_validation.log for details."
             exit 1
-          elif echo "$OUTPUT" | grep -q 'WARNING'; then
-            echo "⚠️  WordPress pattern validation found warnings. Check pattern_validation.log for details."
-            echo "    Warnings don't fail the build, but should be addressed."
-            exit 0
           else
             echo "✅ WordPress pattern validation completed successfully - no errors or warnings found!"
           fi
