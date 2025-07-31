@@ -26,9 +26,7 @@ jobs:
       - name: Validate Composer configuration
         run: |
           echo "🔍 Validating Composer configuration..."
-          OUTPUT=$(composer validate --no-check-publish)
-
-          if grep -q 'ERROR' <<< "$OUTPUT"; then
+          if ! composer validate --no-check-publish; then
             echo "❌ Composer validation failed. Check the output above for details."
             exit 1
           fi
