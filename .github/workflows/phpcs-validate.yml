@@ -1,4 +1,6 @@
 name: PHPCS Validation
+permissions:
+  contents: read
 
 on:
   workflow_call:
