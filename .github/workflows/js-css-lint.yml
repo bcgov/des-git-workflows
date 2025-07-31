@@ -16,6 +16,8 @@ on:
         type: string
         default: '20'
 
+permissions:
+  contents: read
 jobs:
   js-css-linting:
     runs-on: ubuntu-latest
