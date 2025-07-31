@@ -1,0 +1,54 @@
+name: PHPCS Validation
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  phpcs-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Composer dependencies
+        run: |
+          if [ ! -f composer.json ]; then
+            echo "❌ No composer.json found - this workflow requires a PHP project with Composer"
+            exit 1
+          fi
+
+          echo "📦 Installing Composer dependencies..."
+          composer install
+
+      - name: Validate Composer configuration
+        run: |
+          echo "🔍 Validating Composer configuration..."
+          OUTPUT=$(composer validate --no-check-publish)
+
+          if grep -q 'ERROR' <<< "$OUTPUT"; then
+            echo "❌ Composer validation failed. Check the output above for details."
+            exit 1
+          fi
+
+          echo "✅ Composer configuration is valid"
+
+      - name: Run PHP CodeSniffer
+        run: |
+          echo "🧹 Running PHP CodeSniffer..."
+          OUTPUT=$(composer phpcs-allow-todo --no-check-publish 2>&1)
+          echo "$OUTPUT" | tee phpcs_output.log
+
+          if echo "$OUTPUT" | grep -q 'ERROR'; then
+            echo "❌ PHPCS found errors. Check phpcs_output.log for details."
+            exit 1
+          elif echo "$OUTPUT" | grep -q 'WARNING'; then
+            echo "⚠️  PHPCS found warnings. Check phpcs_output.log for details."
+            echo "    Warnings don't fail the build, but should be addressed."
+            exit 0
+          else
+            echo "✅ PHPCS completed successfully - no errors or warnings found!"
+          fi
+
+    env:
+      PHPCS_LOG_FILE: phpcs_output.log

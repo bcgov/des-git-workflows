@@ -1,0 +1,27 @@
+# Copilot Instructions
+copilot-instructions.md
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+
+# Dependency directories
+vendor/
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*
