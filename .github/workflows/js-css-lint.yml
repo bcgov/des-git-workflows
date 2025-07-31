@@ -23,7 +23,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Node.js (version 20 or specified)
+      - name: Install Node.js (version from input or default)
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node_version }}
