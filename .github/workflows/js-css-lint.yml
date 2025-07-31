@@ -48,7 +48,7 @@ jobs:
           for dir in $(find . -type f -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;); do
             if [ "$dir" != "." ]; then
               echo "📦 Installing dependencies in $dir"
-              cd "$dir"
+              cd "$dir" || { echo "Failed to enter directory $dir"; continue; }
               npm install
               cd -
             fi
