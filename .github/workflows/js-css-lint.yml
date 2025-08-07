@@ -8,98 +8,29 @@ on:
         required: false
         type: string
         default: '20'
-  workflow_dispatch:
-    inputs:
-      node_version:
-        description: 'Node.js version to use (defaults to 20)'
-        required: false
-        type: string
-        default: '20'
 
 permissions:
   contents: read
 jobs:
-  js-css-linting:
+  lint:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Node.js (version from input or default)
+      - name: Setup Node.js ${{ inputs.node_version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node_version }}
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
 
       - name: Install dependencies
-        run: |
-          if [ ! -f package.json ]; then
-            echo "⚠️  No package.json found in root - checking subdirectories only"
-          else
-            echo "📦 Installing root dependencies..."
-            npm install
-            echo "📦 Installing @wordpress/scripts..."
-            npm install @wordpress/scripts --save-dev
-          fi
-
-          # Install dependencies in subdirectories
-          echo "🔍 Searching for package.json files in subdirectories..."
-          for dir in $(find . -type f -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;); do
-            if [ "$dir" != "." ]; then
-              echo "📦 Installing dependencies in $dir"
-              cd "$dir" || { echo "Failed to enter directory $dir"; continue; }
-              npm install
-              cd -
-            fi
-          done
+        run: npm ci
 
       - name: Lint CSS
-        run: |
-          echo "🎨 Running CSS linting..."
-
-          # Check if package.json exists
-          if [ ! -f package.json ]; then
-            echo "⚠️  No package.json found, skipping CSS linting."
-            exit 0
-          fi
-
-          # Check if lint:css script exists
-          if ! grep -q '"lint:css"' package.json; then
-            echo "⚠️  No lint:css script found in package.json, skipping CSS linting."
-            exit 0
-          fi
-
-          # Run CSS linting and capture output
-          echo "Running: npm run lint:css"
-          if npm run lint:css; then
-            echo "✅ CSS linting completed successfully!"
-          else
-            echo "❌ CSS linting failed. Please fix the issues above."
-            exit 1
-          fi
+        run: npm run lint:css
 
       - name: Lint JS
-        run: |
-          echo "⚡ Running JavaScript linting..."
-
-          # Check if package.json exists
-          if [ ! -f package.json ]; then
-            echo "⚠️  No package.json found, skipping JS linting."
-            exit 0
-          fi
-
-          # Check if lint:js script exists
-          if ! grep -q '"lint:js"' package.json; then
-            echo "⚠️  No lint:js script found in package.json, skipping JS linting."
-            exit 0
-          fi
-
-          # Run JS linting and capture output
-          echo "Running: npm run lint:js"
-          if npm run lint:js; then
-            echo "✅ JavaScript linting completed successfully!"
-          else
-            echo "❌ JavaScript linting failed. Please fix the issues above."
-            exit 1
-          fi
+        run: npm run lint:js

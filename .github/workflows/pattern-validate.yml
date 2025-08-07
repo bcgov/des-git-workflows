@@ -1,71 +1,35 @@
-name: WordPress Pattern Validation
+name: Scan WordPress Patterns
 
 on:
   workflow_call:
-  workflow_dispatch:
 
 permissions:
   contents: read
 jobs:
-  pattern-validation:
+  validate:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Composer dependencies
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Check patterns directory
         run: |
-          if [ ! -f composer.json ]; then
-            echo "❌ No composer.json found - this workflow requires a PHP project with Composer"
-            exit 1
-          fi
-
-          echo "📦 Installing Composer dependencies..."
-          composer install
-
-      - name: Validate Composer configuration
-        run: |
-          echo "🔍 Validating Composer configuration..."
-          if ! composer validate --no-check-publish; then
-            echo "❌ Composer validation failed. Check the output above for details."
-            exit 1
-          fi
-
-          echo "✅ Composer configuration is valid"
-
-      - name: Check for patterns directory
-        run: |
-          echo "📁 Checking for WordPress patterns directory..."
-
           if [ ! -d patterns ]; then
-            echo "⚠️  No 'patterns' directory found, skipping WordPress pattern validation."
-            echo "This workflow is designed for projects with WordPress block patterns."
+            echo "No patterns directory found, skipping validation"
             exit 0
           fi
 
-          echo "✅ Found patterns directory"
-
-      - name: Validate WordPress patterns
-        run: |
-          echo "🔍 Running WordPress pattern validation..."
-
-          # Check if scan-wp-patterns script exists in composer.json
-          if ! grep -q '"scan-wp-patterns"' composer.json; then
-            echo "⚠️  No scan-wp-patterns script found in composer.json, skipping pattern validation."
-            echo "Please add a 'scan-wp-patterns' script to your composer.json file."
-            exit 0
-          fi
-
-          # Run pattern validation and capture output
-          echo "Running: composer scan-wp-patterns"
-          composer scan-wp-patterns 2>&1 | tee pattern_validation.log
-
-          if [ $? -ne 0 ]; then
-            echo "❌ WordPress pattern validation found errors. Check pattern_validation.log for details."
-            exit 1
-          else
-            echo "✅ WordPress pattern validation completed successfully - no errors or warnings found!"
-          fi
-
-    env:
-      PATTERN_VALIDATION_LOG_FILE: pattern_validation.log
+      - name: Scan WordPress patterns
+        run: composer scan-wp-patterns

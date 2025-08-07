@@ -1,55 +1,29 @@
-name: PHPCS Validation
-permissions:
-  contents: read
+name: PHP Code Quality
 
 on:
   workflow_call:
-  workflow_dispatch:
 
 jobs:
-  phpcs-validation:
+  validate:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Composer dependencies
-        run: |
-          if [ ! -f composer.json ]; then
-            echo "❌ No composer.json found - this workflow requires a PHP project with Composer"
-            exit 1
-          fi
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
 
-          echo "📦 Installing Composer dependencies..."
-          composer install
+      - name: Install dependencies
+        run: composer install --no-dev --optimize-autoloader
 
-      - name: Validate Composer configuration
-        run: |
-          echo "🔍 Validating Composer configuration..."
-          if ! composer validate --no-check-publish; then
-            echo "❌ Composer validation failed. Check the output above for details."
-            exit 1
-          fi
+      - name: Validate composer.json
+        run: composer validate --no-check-publish
 
-          echo "✅ Composer configuration is valid"
-
-      - name: Run PHP CodeSniffer
-        run: |
-          echo "🧹 Running PHP CodeSniffer..."
-          echo "Running composer phpcs-allow-todo..."
-          composer phpcs-allow-todo 2>&1 | tee phpcs_output.log
-
-          EXIT_CODE=$?
-          if [ $EXIT_CODE -eq 0 ]; then
-            echo "✅ PHPCS completed successfully - no errors or warnings found!"
-          elif [ $EXIT_CODE -eq 1 ]; then
-            echo "⚠️  PHPCS found warnings. Check phpcs_output.log for details."
-            echo "    Warnings don't fail the build, but should be addressed."
-            exit 0
-          else
-            echo "❌ PHPCS found errors. Check phpcs_output.log for details."
-            exit $EXIT_CODE
-          fi
-
-    env:
-      PHPCS_LOG_FILE: phpcs_output.log
+      - name: Run PHPCS
+        run: composer phpcs-allow-todo
