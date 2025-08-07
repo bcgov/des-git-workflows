@@ -64,8 +64,6 @@ A comprehensive workflow for validating PHP code quality using PHP CodeSniffer (
 - 🧹 **PHP CodeSniffer** validation using your project's `phpcs-allow-todo` Composer script
 - 🔍 **Composer configuration validation** to ensure proper project setup
 - 📦 **Automatic Composer dependency installation**
-- 📊 **Detailed error and warning reporting** with log file generation
-- ⚠️ **Warning tolerance** - warnings don't fail the build but are reported
 
 #### Requirements
 Your repository must have:
@@ -82,7 +80,7 @@ Example `composer.json` scripts section:
 ```
 
 #### Usage
-The workflow can be called from another workflow file or triggered manually. It runs on Ubuntu latest with the default PHP version.
+The workflow can be called from another workflow file. It runs on Ubuntu latest with the default PHP version.
 
 #### Basic Usage
 ```yaml
@@ -94,30 +92,6 @@ jobs:
     uses: bcgov/des-git-workflows/.github/workflows/phpcs-validate.yml@main
 ```
 
-#### Integration with Other Workflows
-```yaml
-name: Full Code Quality Check
-on: [push, pull_request]
-
-jobs:
-  php-validation:
-    uses: bcgov/des-git-workflows/.github/workflows/phpcs-validate.yml@main
-
-  js-css-linting:
-    uses: bcgov/des-git-workflows/.github/workflows/js-css-lint.yml@main
-```
-
-#### Available Inputs
-This workflow currently accepts no custom inputs.
-
-#### Behavior
-- ❌ **Strict requirements**: Fails immediately if `composer.json` is missing (PHP projects must have Composer)
-- 🔍 **Composer validation**: Validates `composer.json` configuration before running PHPCS
-- 📝 **Log generation**: Creates `phpcs_output.log` with detailed results
-- ⚠️ **Warning handling**: Warnings are reported but don't fail the build
-- ❌ **Error handling**: Any PHPCS errors will fail the workflow
-- ✅ **Clear feedback**: Visual indicators and detailed status messages throughout execution
-
 ### WordPress Pattern Validation
 A specialized workflow for validating WordPress block patterns in projects that include custom pattern development. This workflow provides:
 
@@ -125,8 +99,6 @@ A specialized workflow for validating WordPress block patterns in projects that 
 - 📁 **Pattern directory detection** to ensure patterns exist before validation
 - 🔍 **Composer configuration validation** to ensure proper project setup
 - 📦 **Automatic Composer dependency installation**
-- 📊 **Detailed error and warning reporting** with log file generation
-- ⚠️ **Warning tolerance** - warnings don't fail the build but are reported
 
 #### Requirements
 Your repository must have:
@@ -144,7 +116,7 @@ Example `composer.json` scripts section:
 ```
 
 #### Usage
-The workflow can be called from another workflow file or triggered manually. It runs on Ubuntu latest with the default PHP version and is specifically designed for WordPress projects with block patterns.
+The workflow can be called from another workflow file. It runs on Ubuntu latest with the default PHP version and is specifically designed for WordPress projects with block patterns.
 
 #### Basic Usage
 ```yaml
@@ -170,18 +142,5 @@ jobs:
 
   js-css-linting:
     uses: bcgov/des-git-workflows/.github/workflows/js-css-lint.yml@main
-```
-
-#### Available Inputs
-This workflow currently accepts no custom inputs.
-
-#### Behavior
-- ❌ **Strict requirements**: Fails immediately if `composer.json` is missing (WordPress pattern projects must have Composer)
-- 📁 **Safe execution**: Gracefully exits if no `patterns/` directory is found
-- 🔍 **Script validation**: Checks for required `scan-wp-patterns` script before attempting validation
-- 🔍 **Composer validation**: Validates `composer.json` configuration before running pattern validation
-- 📝 **Log generation**: Creates `pattern_validation.log` with detailed results
-- ⚠️ **Warning handling**: Warnings are reported but don't fail the build
-- ❌ **Error handling**: Any pattern validation errors will fail the workflow
-- ✅ **Clear feedback**: Visual indicators and detailed status messages throughout execution
-
+    with:
+      node_version: '22' # Custom Node.js version
