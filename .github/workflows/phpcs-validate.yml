@@ -1,0 +1,22 @@
+name: PHP Code Quality
+
+on:
+  workflow_call:
+
+jobs:
+  validate:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Validate composer.json
+        run: composer validate --no-check-publish
+
+      - name: Run PHPCS
+        run: composer phpcs-allow-todo

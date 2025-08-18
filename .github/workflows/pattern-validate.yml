@@ -1,0 +1,28 @@
+name: Scan WordPress Patterns
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+jobs:
+  validate:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Check patterns directory
+        run: |
+          if [ ! -d patterns ]; then
+            echo "No patterns directory found, skipping validation"
+            exit 0
+          fi
+
+      - name: Scan WordPress patterns
+        run: composer scan-wp-patterns
