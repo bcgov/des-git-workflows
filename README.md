@@ -233,7 +233,7 @@ jobs:
 
 ## Versioning
 
-We recommend using specific version tags or commits instead of `@main` for production workflows to ensure stability:
+Use specific version tags or commits instead of `@main` for workflows to ensure stability:
 
 ```yaml
 # Use a specific release tag (recommended for production)
