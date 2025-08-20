@@ -1,4 +1,4 @@
-# des-git-workflows
+# DES GIT WORKFLOWS
 
 This repository contains a collection of reusable GitHub Actions workflows designed to streamline automation processes across multiple projects. By leveraging these workflows, teams can enhance efficiency, maintain consistency, and promote best practices in their development workflows.
 
@@ -280,10 +280,3 @@ This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE
 
 - **Cause**: Your project requires a specific Node.js version
 - **Solution**: Use the `node_version` input parameter to specify the required version
-
-### Getting Help
-
-- 📖 **Documentation**: Check this README for detailed usage instructions
-- 🐛 **Bug Reports**: Open an issue in this repository
-- 💡 **Feature Requests**: Open an issue with the "enhancement" label
-- 🤝 **Discussions**: Use GitHub Discussions for questions and community support
