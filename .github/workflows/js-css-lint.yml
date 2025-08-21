@@ -28,16 +28,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          if [ -f package.json ]; then
-            npm install
-            npm install @wordpress/scripts --save-dev
-          fi
+          npm ci
           # Install dependencies in subdirectories
           for dir in $(find . -type f -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;); do
             if [ "$dir" != "." ]; then
               echo "Installing dependencies in $dir"
               cd $dir
-              npm install
+              npm ci
               cd -
             fi
           done
