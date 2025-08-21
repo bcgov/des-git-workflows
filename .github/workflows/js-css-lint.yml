@@ -27,10 +27,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          # Installs project dependencies using npm in all defined workspaces, if present.
-          # Uses a clean install to ensure a reproducible build environment.
-          npm ci --workspaces --if-present
+        run: npm ci
 
       - name: Lint CSS
         run: npm run lint:css
