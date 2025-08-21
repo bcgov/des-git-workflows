@@ -28,9 +28,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Installs project dependencies using npm in all defined workspaces, if present.
-          # Uses a clean install to ensure a reproducible build environment.
-          npm ci --workspaces --if-present
+          npm ci
+          # Install dependencies in subdirectories
+          for dir in $(find . -type f -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;); do
+            if [ "$dir" != "." ]; then
+              echo "Installing dependencies in $dir"
+              cd $dir
+              npm ci
+              cd -
+            fi
+          done
 
       - name: Lint CSS
         run: npm run lint:css
