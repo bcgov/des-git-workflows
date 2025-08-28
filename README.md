@@ -11,6 +11,8 @@ This repository contains a collection of reusable GitHub Actions workflows desig
   - [PHPCS Validation](#phpcs-validation)
   - [WordPress Pattern Validation](#wordpress-pattern-validation)
   - [General Linting](#general-linting)
+  - [WordPress PHP Testing](#wordpress-php-testing)
+  - [JavaScript Testing](#javascript-testing)
 - [Versioning](#versioning)
 - [Contributing](#contributing)
 - [License](#license)
@@ -31,6 +33,8 @@ This repository contains a collection of reusable GitHub Actions workflows desig
 | [phpcs-validate.yml](#phpcs-validation) | PHP code quality validation | `composer.json` with PHPCS script | PHP |
 | [pattern-validate.yml](#wordpress-pattern-validation) | WordPress pattern validation | `composer.json` + `patterns/` dir | WordPress/PHP |
 | [linting.yml](#general-linting) | General purpose linting | `package.json` and/or `composer.json` | Multi-language |
+| [wordpress-php-tests.yml](#wordpress-php-testing) | WordPress PHP unit testing | `composer.json` with test setup | WordPress/PHP |
+| [js-tests.yml](#javascript-testing) | JavaScript unit testing | `package.json` with test script | JavaScript |
 
 ## Workflows
 
@@ -70,7 +74,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   lint:
-    uses: bcgov/des-git-workflows/.github/workflows/js-css-lint.yml@main
+    uses: bcgov/des-git-workflows/.github/workflows/js-css-lint.yml@1.0.0
 ```
 
 #### Custom Node.js Version
@@ -81,7 +85,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   lint:
-    uses: bcgov/des-git-workflows/.github/workflows/js-css-lint.yml@main
+    uses: bcgov/des-git-workflows/.github/workflows/js-css-lint.yml@1.0.0
     with:
       node_version: '18'
 ```
@@ -134,7 +138,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   phpcs:
-    uses: bcgov/des-git-workflows/.github/workflows/phpcs-validate.yml@main
+    uses: bcgov/des-git-workflows/.github/workflows/phpcs-validate.yml@1.0.0
 ```
 
 ### WordPress Pattern Validation
@@ -176,10 +180,10 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   pattern-validation:
-    uses: bcgov/des-git-workflows/.github/workflows/pattern-validate.yml@main
+    uses: bcgov/des-git-workflows/.github/workflows/pattern-validate.yml@1.0.0
 ```
 
-#### Full WordPress Project Validation
+#### Full WordPress Project Validation (Including tests)
 
 ```yaml
 name: Complete WordPress Code Quality
@@ -187,15 +191,21 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   php-validation:
-    uses: bcgov/des-git-workflows/.github/workflows/phpcs-validate.yml@main
+    uses: bcgov/des-git-workflows/.github/workflows/phpcs-validate.yml@1.0.0
 
   pattern-validation:
-    uses: bcgov/des-git-workflows/.github/workflows/pattern-validate.yml@main
+    uses: bcgov/des-git-workflows/.github/workflows/pattern-validate.yml@1.0.0
 
   js-css-linting:
-    uses: bcgov/des-git-workflows/.github/workflows/js-css-lint.yml@main
+    uses: bcgov/des-git-workflows/.github/workflows/js-css-lint.yml@1.0.0
     with:
       node_version: '22' # Custom Node.js version
+
+  php-tests:
+    uses: bcgov/des-git-workflows/.github/workflows/wordpress-php-tests.yml@1.0.0
+
+  js-tests:
+    uses: bcgov/des-git-workflows/.github/workflows/js-tests.yml@1.0.0
 ```
 
 ### General Linting
@@ -228,12 +238,123 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   lint:
-    uses: bcgov/des-git-workflows/.github/workflows/linting.yml@main
+    uses: bcgov/des-git-workflows/.github/workflows/linting.yml@1.0.0
+```
+
+### WordPress PHP Testing
+
+A comprehensive workflow for running PHP unit tests in WordPress environments using PHPUnit. This workflow provides:
+
+- 🧪 **PHPUnit Testing** with WordPress test suite integration
+- 🗄️ **MySQL Database** service for database-dependent tests
+- 🔧 **WordPress Test Environment** setup with SVN-based WordPress core and test libraries
+- 📦 **Automatic Composer dependency installation**
+- ⚙️ **PHP 7.4** runtime environment optimized for WordPress compatibility
+- 📊 **TestDox output format** for readable test results
+
+#### WordPress PHP Testing Requirements
+
+Your repository must have:
+
+1. A `composer.json` file with proper PHP project configuration
+2. A Composer script named `test-setup` for WordPress test environment setup
+3. PHPUnit configuration compatible with WordPress testing
+
+Example `composer.json` scripts section:
+
+```json
+{
+  "scripts": {
+    "test-setup": "install-wp-tests.sh wordpress_test root '' localhost latest"
+  }
+}
+```
+
+#### WordPress PHP Testing Usage
+
+The workflow can be called from another workflow file. It runs on Ubuntu latest with PHP 7.4 and includes a MySQL 8 service.
+
+#### WordPress PHP Testing Basic Usage
+
+```yaml
+name: WordPress PHP Testing
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  test-php:
+    uses: bcgov/des-git-workflows/.github/workflows/wordpress-php-tests.yml@1.0.0
+```
+
+#### WordPress PHP Testing Behavior
+
+- 🗄️ **MySQL Service**: Provides MySQL 8 database with health checks
+- 📁 **WordPress Environment**: Sets up WordPress core in `/tmp/WordPress` with test libraries
+- 🧪 **PHPUnit Configuration**: Uses `vendor/bcgov/wordpress-utils/phpunit.xml.dist` configuration
+- 📊 **Test Output**: Provides TestDox format for human-readable test results
+
+### JavaScript Testing
+
+A streamlined workflow for running JavaScript unit tests using npm. This workflow provides:
+
+- 🧪 **JavaScript Testing** using your project's `test` npm script
+- 📦 **Automatic npm dependency installation** with caching
+- ⚡ **Node.js 20** runtime environment
+- 🚀 **npm caching** for faster builds
+
+#### JavaScript Testing Requirements
+
+Your repository must have:
+
+1. A `package.json` file with proper Node.js project configuration
+2. An npm script named `test` for running tests
+
+Example `package.json` scripts section:
+
+```json
+{
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  }
+}
+```
+
+#### JavaScript Testing Usage
+
+The workflow can be called from another workflow file. It runs on Ubuntu latest with Node.js 20.
+
+#### JavaScript Testing Basic Usage
+
+```yaml
+name: JavaScript Testing
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  test-js:
+    uses: bcgov/des-git-workflows/.github/workflows/js-tests.yml@1.0.0
+```
+
+#### Combined Testing Example
+
+```yaml
+name: Complete Test Suite
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  php-tests:
+    uses: bcgov/des-git-workflows/.github/workflows/wordpress-php-tests.yml@1.0.0
+
+  js-tests:
+    uses: bcgov/des-git-workflows/.github/workflows/js-tests.yml@1.0.0
+
+  code-quality:
+    uses: bcgov/des-git-workflows/.github/workflows/linting.yml@1.0.0
 ```
 
 ## Versioning
 
-Use specific version tags or commits instead of `@main` for workflows to ensure stability:
+Use specific version tags or commits instead of `@1.0.0` for workflows to ensure stability:
 
 ```yaml
 # Use a specific release tag (recommended for production)
