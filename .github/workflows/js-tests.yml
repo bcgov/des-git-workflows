@@ -19,7 +19,17 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm ci
+          # Install dependencies in subdirectories
+          for dir in $(find . -type f -name "package.json" -not -path "*/node_modules/*" -exec dirname {} \;); do
+            if [ "$dir" != "." ]; then
+              echo "Installing dependencies in $dir"
+              cd $dir
+              npm ci
+              cd -
+            fi
+          done
 
       - name: Run tests
         run: npm run test
