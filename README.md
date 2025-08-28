@@ -354,7 +354,7 @@ jobs:
 
 ## Versioning
 
-Use specific version tags or commits instead of `@1.0.0` for workflows to ensure stability:
+Use specific version tags or commits (like `@1.0.0`) instead of `@main` for workflows to ensure stability:
 
 ```yaml
 # Use a specific release tag (recommended for production)
