@@ -24,7 +24,7 @@ jobs:
           node-version: ${{ inputs.node_version }}
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install node dependencies
         run: |
           npm ci
           # Install dependencies in subdirectories
@@ -36,6 +36,9 @@ jobs:
               cd -
             fi
           done
+
+      - name: Install Composer dependencies
+        run: composer install
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
