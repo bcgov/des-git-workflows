@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Node.js ${{ inputs.node_version }}
         uses: actions/setup-node@v3
@@ -47,7 +47,7 @@ jobs:
         run: npm run wp-env start
 
       - name: Run JS unit tests
-        run: npm run test:unit
+        run: npm run test
 
       - name: Run e2e tests
         run: npm run test:e2e
