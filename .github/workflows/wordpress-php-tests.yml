@@ -35,4 +35,4 @@ jobs:
         run: npm run wp-env start
 
       - name: Run PHP unit tests
-        run: vendor/bin/phpunit --configuration vendor/bcgov/wordpress-utils/phpunit.xml.dist --testdox
+        run: npm run test:unit:php
