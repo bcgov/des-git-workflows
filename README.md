@@ -345,6 +345,33 @@ jobs:
     uses: bcgov/des-git-workflows/.github/workflows/linting.yml@1.2.0
 ```
 
+## wp-env Configuration
+
+`wp-env` provides a consistent WordPress environment for running automated PHP WP integration and E2E tests. In order for a plugin or theme to use `wp-env`, we must do the following:
+1. Add `wp-env` as a dev dependency in `package.json`.
+2. Add the script: `"wp-env": "wp-env"` so we can run `npm run wp-env start` to start the environment.
+3. Create a `.wp-env.json` configuration file at project root.
+   1. For plugins, this file should look like this:
+        ```json
+        {
+            "core": "WordPress/WordPress#6.8",
+            "phpVersion": "7.4",
+            "plugins": [ "." ]
+        }
+        ```
+   2. For themes, it should look like this:
+        ```json
+        {
+            "core": "WordPress/WordPress#6.8",
+            "phpVersion": "7.4",
+            "themes": [ "." ],
+            "lifecycleScripts": {
+                # Otherwise the theme will not automatically be activated.
+                "afterStart": "wp-env run tests-cli wp theme activate design-system-wordpress-theme"
+            }
+        }
+        ```
+
 ## Versioning
 
 Use specific version tags or commits (like `@1.2.0`) instead of `@main` for workflows to ensure stability:
